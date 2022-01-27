@@ -11,7 +11,7 @@
     />
 
     <div class="item">
-      <div>使用自定义组件</div>
+      <div>使用自定义组件（需支持v-model)</div>
       <div>value: {{ value2 }}</div>
     </div>
     <mentions
@@ -51,45 +51,51 @@ export default {
       value2: '',
       options: [
         {
-          label: '123',
-          value: '123'
+          url: '',
+          label: 'username1',
+          value: 'username1',
+          disabled: true
         },
         {
-          label: '234',
-          value: '234'
+          url: '',
+          label: 'username2',
+          value: 'username2'
         },
         {
-          label: '2341',
-          value: '2341'
+          url: '',
+          label: 'username3333',
+          value: 'username3333'
         },
         {
-          label: '2342',
-          value: '2342'
+          url: '',
+          label: 'username4',
+          value: 'username4'
         },
         {
-          label: '2343',
-          value: '2343'
+          url: '',
+          label: 'username5',
+          value: 'username5'
         },
         {
-          label: '2344',
-          value: '2344'
+          url: '',
+          label: 'username6',
+          value: 'username6'
         },
         {
-          label: '2345',
-          value: '2345'
+          url: '',
+          label: 'username7',
+          value: 'username7'
         },
         {
-          label: '23431',
-          value: '23431'
+          url: '',
+          label: 'username8',
+          value: 'username8'
         },
         {
-          label: '23441',
-          value: '23441'
+          url: '',
+          label: 'username9',
+          value: 'username9'
         },
-        {
-          label: '23451',
-          value: '23451'
-        }
       ]
     }
   }
@@ -98,6 +104,6 @@ export default {
 
 <style lang="less" scoped>
 .item {
-  margin-top: 50px;
+  margin-top: 70px;
 }
 </style>

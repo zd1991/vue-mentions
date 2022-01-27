@@ -18,6 +18,7 @@
         :rows="rows"
         @input="handleInput"
         @keydown="handleKeydown"
+        @blur="closePopper"
       />
     </slot>
 
@@ -25,6 +26,8 @@
       ref="popper"
       v-show="showPopper"
       :visible="showPopper"
+      :topPoint="topPoint"
+      :offset="offset"
       :options="options"
       :keyword="keyword"
       :position="popperPosition"
@@ -68,7 +71,7 @@ export default {
     offset: {
       type: Object,
       default: () => ({
-        top: 15,
+        top: 17,
         left: 4,
       }),
     },
@@ -81,6 +84,7 @@ export default {
   },
   data() {
     return {
+      topPoint: 0,
       textarea: null,
       showPopper: false,
       atPosition: 0,
@@ -100,8 +104,7 @@ export default {
      */
     calcPopperPosition() {
       const { top, left } = getCaretCoordinates(this.textarea, this.textarea.selectionEnd);
-      const { top: topOffset, left: leftOffset } = this.offset
-      this.popperPosition = { top: `${top + topOffset}px`, left: `${left + leftOffset}px` };
+      this.popperPosition = { top, left };
     },
     /**
      * 设置光标位置
@@ -190,9 +193,7 @@ export default {
         // 回车
         case keyMap.ENTER:
           if (this.showPopper) {
-            this.$refs.popper.handleClick();
-            event.preventDefault();
-            event.stopPropagation();
+            this.$refs.popper.handleClick(event);
           }
           break;
 
@@ -201,6 +202,8 @@ export default {
         case keyMap.ARROWUP: 
           if (this.showPopper) {
             this.$refs.popper.changeSelected(event.key);
+            event.preventDefault();
+            event.stopPropagation();
           }
           break;
       }
@@ -255,8 +258,11 @@ export default {
   },
   mounted() {
     this.textarea = this.$el.querySelector('input') || this.$el.querySelector('textarea');
+    const { top } = this.textarea.getBoundingClientRect();
+
     // 避免抖动
     this.calcPopperPosition();
+    this.topPoint = top;
   }
 };
 </script>
