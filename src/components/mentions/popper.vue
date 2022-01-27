@@ -1,7 +1,8 @@
 <template>
   <div class="popper-list" :style="{...position}">
-    <template v-for="(item, index) in internalOptions">
+    <template v-if="internalOptions.length">
       <div
+        v-for="(item, index) in internalOptions"
         :key="item.value"
         :class="{
           'popper-list-item': true,
@@ -9,8 +10,10 @@
         }"
         @mouseover="() => handleMouseenter(index)"
         @click="() => handleClick(index)"
-    >{{ item.label }}</div>
+      >{{ item.label }}</div>
     </template>
+
+    <div v-else class="popper-list-empty">暂无数据</div>
   </div>
 </template>
 
@@ -91,17 +94,22 @@ export default {
   position: absolute;
   cursor: pointer;
   min-width: 85px;
-  min-height: 100px;
+  min-height: 30px;
   max-height: 150px;
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   background-color: #fff;
   overflow-y: auto;
+  font-size: 13px;
   &-item {
     padding: 0px 4px 2px;
     line-height: 30px;
-    font-size: 13px;
   }
+  &-empty {
+    text-align: center;
+    line-height: 30px;
+  }
+
   .selected {
     color: #409eff;
     background-color: #ecf5ff;

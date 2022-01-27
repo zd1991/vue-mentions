@@ -1,14 +1,25 @@
 <template>
   <div class="mention-wraper">
-    <textarea
-      ref="textarea"
-      class="mention-editor"
-      v-model="internalValue"
-      :placeholder="placeholder"
-      :rows="rows"
-      @input="handleInput"
-      @keydown="handleKeydown"
-    />
+    <slot
+      name="textarea"
+      v-bind="{
+        ...extraProps,
+        rows,
+        placeholder,
+        nativeInput: handleInput,
+        nativeKeydown: handleKeydown,
+      }"
+    >
+      <textarea
+        class="mention-editor"
+        v-model="internalValue"
+        v-bind="extraProps"
+        :placeholder="placeholder"
+        :rows="rows"
+        @input="handleInput"
+        @keydown="handleKeydown"
+      />
+    </slot>
 
     <popper
       ref="popper"
@@ -28,13 +39,16 @@ import popper from './popper.vue';
 import { keyMap, setSelectionRange } from './util';
 
 export default {
-  name: 'mention',
+  name: 'mentions',
   components: {
     popper,
   },
   props: {
     // 绑定数据
-    value: String,
+    value: {
+      type: String,
+      default: '',
+    },
     placeholder: {
       type: String,
       default: '请输入内容',
@@ -43,13 +57,20 @@ export default {
       type: Number,
       default: 2,
     },
+    extraProps: {
+      type: Object,
+      default: () => ({}),
+    },
     suffix: {
       type: String,
       default: ' ',
     },
     offset: {
-      type: Number,
-      default: 4,
+      type: Object,
+      default: () => ({
+        top: 15,
+        left: 4,
+      }),
     },
     // 候选列表
     options: {
@@ -68,13 +89,19 @@ export default {
       popperPosition: {},
     };
   },
+  watch: {
+    value(val) {
+      this.internalValue = val;
+    },
+  },
   methods: {
     /**
      * 计算候选列表位置
      */
     calcPopperPosition() {
       const { top, left } = getCaretCoordinates(this.textarea, this.textarea.selectionEnd);
-      this.popperPosition = { top: `${top}px`, left: `${left + this.offset}px` };
+      const { top: topOffset, left: leftOffset } = this.offset
+      this.popperPosition = { top: `${top + topOffset}px`, left: `${left + leftOffset}px` };
     },
     /**
      * 设置光标位置
@@ -105,27 +132,26 @@ export default {
       let prefixStr = this.internalValue.substring(0, selectionEnd);
       const selectedItem = this.getSelectedItem(prefixStr);
 
-      // 删除 @xxx 内容
-      if (selectedItem) {
+      if (selectedItem) { // 删除 @xxx 内容
         event.preventDefault();
         event.stopPropagation();
+        this.setSelectionRange(selectionEnd - length);
+        this.showPopper && this.closePopper();
+
         // 计算要要删除子窜的长度
         const length = `@${selectedItem}${this.suffix}`.length;
         this.internalValue = prefixStr.substring(0, selectionEnd - length)
           + this.internalValue.substring(selectionEnd);
-        this.setSelectionRange(selectionEnd - length);
-        this.showPopper && this.closePopper();
-        return;
-      }
-      // 删除 @ 字符
-      if (
+        
+      } else if ( // 删除 @ 字符
         this.showPopper
         && selectionEnd
         && this.internalValue.substring(selectionEnd - 1, selectionEnd) === '@'
       ) {
         this.closePopper();
-        return;
       }
+      // v-model
+      this.$emit('input', this.internalValue);
     },
     /**
      * 打开候选列表
@@ -192,6 +218,11 @@ export default {
             this.openPopper();
           }
         }
+
+        // 输入空格隐藏 popper
+        if (this.showPopper && event.data === ' ') {
+          this.closePopper();
+        }
       }
 
       // 当打开popper记录keyword用于筛选
@@ -199,6 +230,8 @@ export default {
         this.keyword = this.internalValue.substring(this.atPosition);
         this.calcPopperPosition();
       }
+
+      this.$emit('input', this.internalValue);
     },
     /**
      * 处理选中事件
@@ -211,6 +244,9 @@ export default {
         this.internalValue = subStr + temp;
         this.setSelectionRange(this.atPosition + temp.length)
         this.closePopper();
+
+        // v-model
+        this.$emit('input', this.internalValue);
       }
     }
   },
@@ -218,7 +254,7 @@ export default {
     this.internalValue = this.value;
   },
   mounted() {
-    this.textarea = this.$refs.textarea;
+    this.textarea = this.$el.querySelector('input') || this.$el.querySelector('textarea');
     // 避免抖动
     this.calcPopperPosition();
   }
@@ -232,6 +268,7 @@ export default {
     padding: 8px;
     width: 500px;
     outline: none;
+    box-sizing: border-box;
     border-radius: 4px;
     border: 1px solid #dcdfe6;
     &:focus {
@@ -239,5 +276,4 @@ export default {
     }
   }
 }
-
 </style>

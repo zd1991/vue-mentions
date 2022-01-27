@@ -1,19 +1,54 @@
 <template>
   <div id="app">
-    <mention :rows="4" :options="options" />
+    <div>
+      <div>使用默认输入框</div>
+      <div>value: {{ value1 }}</div>
+    </div>
+    <mentions
+      :rows="4"
+      :options="options"
+      v-model="value1"
+    />
+
+    <div class="item">
+      <div>使用自定义组件</div>
+      <div>value: {{ value2 }}</div>
+    </div>
+    <mentions
+      v-model="value2"
+      :options="options"
+      :rows="4"
+      :extraProps="{
+        type: 'textarea',
+        style: {
+          width: '500px'
+        }
+      }"
+    >
+      <template v-slot:textarea="{ nativeInput, nativeKeydown, ...otherProps }">
+        <el-input
+          v-model="value2"
+          v-bind="otherProps"
+          @input.native="nativeInput"
+          @keydown.native="nativeKeydown"
+        />
+      </template>
+    </mentions>
   </div>
 </template>
 
 <script>
-import mention from './components/mention/index.vue'
+import mentions from './components/mentions/index.vue';
 
 export default {
   name: 'App',
   components: {
-    mention
+    mentions,
   },
   data() {
     return {
+      value1: '',
+      value2: '',
       options: [
         {
           label: '123',
@@ -60,3 +95,9 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.item {
+  margin-top: 50px;
+}
+</style>
