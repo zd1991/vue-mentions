@@ -160,10 +160,7 @@ export default {
      * 鼠标事件
      */
     handleMouseover(index) {
-      const { disabled } = this.internalOptions[index];
-      if (!disabled) {
-        this.selectedIndex = index;
-      }
+      this.selectedIndex = index;
     },
     /**
      * 点击事件

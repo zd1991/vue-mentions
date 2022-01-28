@@ -38,13 +38,7 @@
 </template>
 
 <script>
-import mentions from './components/mentions/index.vue';
-
 export default {
-  name: 'App',
-  components: {
-    mentions,
-  },
   data() {
     return {
       value1: '',
@@ -53,8 +47,7 @@ export default {
         {
           url: '',
           label: 'username1',
-          value: 'username1',
-          disabled: true
+          value: 'username1'
         },
         {
           url: '',
@@ -89,7 +82,8 @@ export default {
         {
           url: '',
           label: 'username8',
-          value: 'username8'
+          value: 'username8',
+          disabled: true
         },
         {
           url: '',
